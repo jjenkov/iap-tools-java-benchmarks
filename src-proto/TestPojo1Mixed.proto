@@ -1,0 +1,15 @@
+package com.jenkov.proto;
+
+option java_package = "com.jenkov.proto";
+option java_outer_classname = "TestPojo1MixedOuter";
+
+message TestPojo1Mixed {
+    required bool   field0  = 1;
+    required int64  field1  = 2;
+    required float  field2  = 3;
+    required double field3  = 4;
+    required string field4  = 5;
+
+
+}
+

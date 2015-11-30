@@ -1,0 +1,18 @@
+package com.jenkov.proto;
+
+option java_package = "com.jenkov.proto";
+option java_outer_classname = "TestPojo10LongOuter";
+
+message TestPojo10Long {
+    required int64 field0  = 1;
+    required int64 field1  = 2;
+    required int64 field2  = 3;
+    required int64 field3  = 4;
+    required int64 field4  = 5;
+    required int64 field5  = 6;
+    required int64 field6  = 7;
+    required int64 field7  = 8;
+    required int64 field8  = 9;
+    required int64 field9  = 10;
+}
+

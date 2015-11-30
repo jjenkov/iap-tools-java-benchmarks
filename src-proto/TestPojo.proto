@@ -1,0 +1,19 @@
+package com.jenkov.proto;
+
+option java_package = "com.jenkov.proto";
+option java_outer_classname = "TestPojoProtos";
+
+message TestPojo {
+    required bool boolean1 = 4;     //13
+    required bool boolean2 = 5;    //13
+
+    required int32 short1 = 6;
+    required int32 int1   = 7;
+    required int64 long1  = 8;
+
+    required float  float1 = 9;
+    required double dbl1   = 10;
+
+    required string str1 = 11;
+}
+
