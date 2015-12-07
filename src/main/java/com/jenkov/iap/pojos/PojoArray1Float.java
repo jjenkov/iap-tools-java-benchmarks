@@ -7,6 +7,10 @@ public class PojoArray1Float {
 
     public Pojo1Float[] pojos = null;
 
+    public PojoArray1Float() {
+
+    }
+
     public PojoArray1Float(int count) {
         this.pojos = new Pojo1Float[count];
         for(int i=0; i < count; i++){

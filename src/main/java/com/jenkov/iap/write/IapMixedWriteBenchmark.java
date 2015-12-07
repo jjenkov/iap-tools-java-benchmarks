@@ -103,7 +103,7 @@ public class IapMixedWriteBenchmark {
         index += IonWriter.writeDirect(state.dest, index, state.field4KeyFieldBytes);
         index += IonWriter.writeUtf8(state.dest, index, state.pojo1Mixed.field4);
 
-        IonWriter.writeObjectEnd(state.dest, index, 1, index);
+        IonWriter.writeObjectEnd(state.dest, 0, 1, index -1 -1); //-1 for object lead byte, -1 for length byte
 
         blackhole.consume(state.dest);
         return state.dest;
@@ -123,7 +123,7 @@ public class IapMixedWriteBenchmark {
         index += IonWriter.writeFloat64(state.dest, index, state.pojo1Mixed.field3);
         index += IonWriter.writeUtf8(state.dest, index, state.pojo1Mixed.field4);
 
-        IonWriter.writeObjectEnd(state.dest, index, 1, index);
+        IonWriter.writeObjectEnd(state.dest, 0, 1, index -1 -1); //-1 for object lead byte, -1 for length byte
 
         blackhole.consume(state.dest);
         return state.dest;

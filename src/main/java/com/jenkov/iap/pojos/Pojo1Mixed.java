@@ -15,4 +15,7 @@ public class Pojo1Mixed {
     public String toString() {
         return getClass().getSimpleName();
     }
+
+
+
 }
