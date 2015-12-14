@@ -1,6 +1,6 @@
-package com.jenkov.proto;
+package com.jenkov.iap.ion.proto;
 
-option java_package = "com.jenkov.proto";
+option java_package = "com.jenkov.iap.ion.proto";
 option java_outer_classname = "TestPojo1MixedOuter";
 
 message TestPojo1Mixed {
