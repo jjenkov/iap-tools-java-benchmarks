@@ -7,6 +7,10 @@ public class PojoArray1String {
 
     public Pojo1String[] pojos = null;
 
+    public PojoArray1String() {
+
+    }
+
     public PojoArray1String(int count) {
         this.pojos = new Pojo1String[count];
         for(int i=0; i < count; i++){

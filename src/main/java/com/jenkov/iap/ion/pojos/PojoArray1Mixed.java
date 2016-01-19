@@ -3,18 +3,18 @@ package com.jenkov.iap.ion.pojos;
 /**
  * Created by jjenkov on 16-11-2015.
  */
-public class PojoArray10String {
+public class PojoArray1Mixed {
 
-    public Pojo10String[] pojos = null;
+    public Pojo1Mixed[] pojos = null;
 
-    public PojoArray10String() {
+    public PojoArray1Mixed() {
 
     }
 
-    public PojoArray10String(int count) {
-        this.pojos = new Pojo10String[count];
+    public PojoArray1Mixed(int count) {
+        this.pojos = new Pojo1Mixed[count];
         for(int i=0; i < count; i++){
-            this.pojos[i] = new Pojo10String();
+            this.pojos[i] = new Pojo1Mixed();
         }
     }
 

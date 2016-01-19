@@ -7,6 +7,9 @@ public class PojoArray1Boolean {
 
     public Pojo1Boolean[] pojos = null;
 
+    public PojoArray1Boolean() {
+    }
+
     public PojoArray1Boolean(int count) {
         this.pojos = new Pojo1Boolean[count];
         for(int i=0; i < count; i++){

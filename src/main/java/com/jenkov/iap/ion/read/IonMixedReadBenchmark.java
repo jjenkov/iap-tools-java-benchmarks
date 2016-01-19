@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.jenkov.iap.ion.IonFieldTypes;
 import com.jenkov.iap.ion.pojos.Pojo1Mixed;
+import com.jenkov.iap.ion.pojos.PojoArray1Mixed;
 import com.jenkov.iap.ion.write.IonObjectWriter;
 import com.jenkov.iap.ion.write.IonWriter;
 import com.jenkov.iap.ion.proto.TestPojo1MixedOuter;
@@ -23,19 +24,27 @@ public class IonMixedReadBenchmark {
 
     @State(Scope.Thread)
     public static class IapState {
-        Pojo1Mixed pojo1 = new Pojo1Mixed();
+        Pojo1Mixed      pojo1      = new Pojo1Mixed();
+        PojoArray1Mixed pojoArray1 = new PojoArray1Mixed();
 
-        IonObjectWriter objWriterSingle = new IonObjectWriter(Pojo1Mixed.class);
-        IonObjectReader objReaderSingle = new IonObjectReader(Pojo1Mixed.class);
+        IonObjectWriter objWriter1_1  = new IonObjectWriter(Pojo1Mixed.class);
+        IonObjectWriter objWriter10_1 = new IonObjectWriter(PojoArray1Mixed.class);
+
+        IonObjectReader objReader1_1  = new IonObjectReader(Pojo1Mixed.class);
+        IonObjectReader objReader10_1 = new IonObjectReader(PojoArray1Mixed.class);
+
         IonReader       readerSingle    = new IonReader();
 
-        byte[] dest = new byte[10 * 1024];
-        int    destLength   = 0;
+        byte[] dest1_1        = new byte[10 * 1024];
+        int    dest1_1Length  = 0;
 
-        byte[] destOptimized   = new byte[10 * 1024];
+        byte[] dest10_1       = new byte[10 * 1024];
+        int    dest10_1Length = 0;
+
+        byte[] destOptimized       = new byte[10 * 1024];
         int    destOptimizedLength = 0;
 
-        byte[] destOptimizedStream   = new byte[10 * 1024];
+        byte[] destOptimizedStream       = new byte[10 * 1024];
         int    destOptimizedStreamLength = 0;
 
         byte[]    field0 = new byte[]{'f','i','e','l','d','0'};
@@ -47,8 +56,8 @@ public class IonMixedReadBenchmark {
 
         @Setup(Level.Trial)
         public void doSetup() {
-            destLength = objWriterSingle.writeObject(pojo1, 1, dest, 0);
-
+            dest1_1Length  = objWriter1_1.writeObject (pojo1     , 1, dest1_1 , 0);
+            dest10_1Length = objWriter10_1.writeObject(pojoArray1, 1, dest10_1, 0);
 
             int index = 0;
             index += IonWriter.writeObjectBegin(destOptimized, index, 1);
@@ -69,27 +78,30 @@ public class IonMixedReadBenchmark {
             index += IonWriter.writeFloat64(destOptimizedStream, index, pojo1.field3);
             index += IonWriter.writeUtf8   (destOptimizedStream, index, pojo1.field4);
             destOptimizedStreamLength = index;
-
         }
-
     }
 
 
 
     @State(Scope.Thread)
     public static class JacksonState {
-        Pojo1Mixed pojo1 = new Pojo1Mixed();
+        Pojo1Mixed      pojo1      = new Pojo1Mixed();
+        PojoArray1Mixed pojoArray1 = new PojoArray1Mixed();
 
         ObjectMapper objectMapper        = new ObjectMapper();
         ObjectMapper objectMapperMsgPack = new ObjectMapper(new MessagePackFactory());
         ObjectMapper objectMapperCbor    = new ObjectMapper(new CBORFactory());
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream(10 * 1024);
-        ByteArrayOutputStream outMulti  = new ByteArrayOutputStream(10 * 1024);
+        ByteArrayOutputStream out     = new ByteArrayOutputStream(10 * 1024);
+        ByteArrayOutputStream out10_1 = new ByteArrayOutputStream(10 * 1024);
 
         byte[] bytesJson     = null;
         byte[] bytesMsgPack  = null;
         byte[] bytesCbor     = null;
+
+        byte[] bytesJson10_1    = null;
+        byte[] bytesMsgPack10_1 = null;
+        byte[] bytesCbor10_1    = null;
 
 
         @Setup(Level.Trial)
@@ -98,13 +110,24 @@ public class IonMixedReadBenchmark {
                 objectMapper.writeValue(out, pojo1);
                 bytesJson = out.toByteArray();
 
+                objectMapper.writeValue(out10_1, pojoArray1);
+                bytesJson10_1 = out10_1.toByteArray();
+
                 out.reset();
                 objectMapperMsgPack.writeValue(out, pojo1);
                 bytesMsgPack = out.toByteArray();
 
+                out10_1.reset();
+                objectMapperMsgPack.writeValue(out10_1, pojoArray1);
+                bytesMsgPack10_1 = out10_1.toByteArray();
+
                 out.reset();
                 objectMapperCbor.writeValue(out, pojo1);
                 bytesCbor = out.toByteArray();
+
+                out10_1.reset();
+                objectMapperCbor.writeValue(out10_1, pojoArray1);
+                bytesCbor = out10_1.toByteArray();
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -115,7 +138,6 @@ public class IonMixedReadBenchmark {
 
     @State(Scope.Thread)
     public static class ProtobufState {
-
         TestPojo1MixedOuter.TestPojo1Mixed testPojo = null;
 
         ByteArrayOutputStream out = new ByteArrayOutputStream(10 * 1024);
@@ -148,9 +170,8 @@ public class IonMixedReadBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object ionObjectReaderReadSingle(IapState state, Blackhole blackhole) {
-
-        Pojo1Mixed pojo = (Pojo1Mixed) state.objReaderSingle.read(state.dest, 0);
+    public Object ionObjectReaderRead1_1(IapState state, Blackhole blackhole) {
+        Pojo1Mixed pojo = (Pojo1Mixed) state.objReader1_1.read(state.dest1_1, 0);
 
         blackhole.consume(pojo);
         return pojo;
@@ -159,18 +180,31 @@ public class IonMixedReadBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object ionReaderReadSingle(IapState state, Blackhole blackhole) {
+    public Object ionObjectReaderRead10_1(IapState state, Blackhole blackhole) {
+        PojoArray1Mixed pojo = (PojoArray1Mixed) state.objReader10_1.read(state.dest10_1, 0);
+
+        blackhole.consume(pojo);
+        return pojo;
+    }
+
+
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    public Object ionReaderRead1_1(IapState state, Blackhole blackhole) {
 
         IonReader reader = state.readerSingle;
-        reader.setSource(state.dest, 0, state.destLength);
+        reader.setSource(state.dest1_1, 0, state.dest1_1Length);
 
         Pojo1Mixed pojo = new Pojo1Mixed();
 
         reader.parse();
         if(reader.fieldType == IonFieldTypes.OBJECT){
-            reader.parseInto();
+            reader.moveInto();
 
             while(reader.hasNext()){
+                reader.next();
+                reader.parse();
+
                 if(reader.fieldType == IonFieldTypes.KEY_SHORT){
                     if(reader.matches(state.field0)){
                         pojo.field0 = reader.next().parse().readBoolean();
@@ -184,11 +218,8 @@ public class IonMixedReadBenchmark {
                         pojo.field4 = reader.next().parse().readUtf8String();
                     }
                 }
-                reader.next().parse();
             }
-
         }
-
 
         blackhole.consume(pojo);
         return pojo;
@@ -197,7 +228,7 @@ public class IonMixedReadBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object ionReaderOptimizedReadSingle(IapState state, Blackhole blackhole) {
+    public Object ionReaderOptimizedRead1_1(IapState state, Blackhole blackhole) {
 
         IonReader reader = state.readerSingle;
         reader.setSource(state.destOptimized, 0, state.destOptimizedLength);
@@ -206,7 +237,9 @@ public class IonMixedReadBenchmark {
 
         reader.parse();
         if(reader.fieldType == IonFieldTypes.OBJECT){
-            reader.parseInto();
+            reader.moveInto();
+            reader.next();
+            reader.parse();
             pojo.field0 = reader.readBoolean();
             pojo.field1 = reader.next().parse().readInt64();
             pojo.field2 = reader.next().parse().readFloat32();
@@ -221,7 +254,7 @@ public class IonMixedReadBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object ionReaderOptimizedStreamReadSingle(IapState state, Blackhole blackhole) {
+    public Object ionReaderOptimizedStreamRead1_1(IapState state, Blackhole blackhole) {
 
         IonReader reader = state.readerSingle;
         reader.setSource(state.destOptimizedStream, 0, state.destOptimizedStreamLength);
@@ -241,7 +274,7 @@ public class IonMixedReadBenchmark {
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object jsonReadSingle(JacksonState state, Blackhole blackhole) {
+    public Object jsonRead1_1(JacksonState state, Blackhole blackhole) {
 
         try {
             Pojo1Mixed pojo = state.objectMapper.readValue(state.bytesJson, Pojo1Mixed.class);
@@ -254,10 +287,25 @@ public class IonMixedReadBenchmark {
         }
     }
 
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    public Object jsonRead10_1(JacksonState state, Blackhole blackhole) {
+
+        try {
+            PojoArray1Mixed pojo = state.objectMapper.readValue(state.bytesJson10_1, PojoArray1Mixed.class);
+            blackhole.consume(pojo);
+            return pojo;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object msgPackReadSingle(JacksonState state, Blackhole blackhole) {
+    public Object msgPackRead1_1(JacksonState state, Blackhole blackhole) {
 
         try {
             Pojo1Mixed pojo = state.objectMapperMsgPack.readValue(state.bytesMsgPack, Pojo1Mixed.class);
@@ -270,10 +318,24 @@ public class IonMixedReadBenchmark {
         }
     }
 
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    public Object msgPackRead10_1(JacksonState state, Blackhole blackhole) {
+
+        try {
+            PojoArray1Mixed pojo = state.objectMapperMsgPack.readValue(state.bytesMsgPack10_1, PojoArray1Mixed.class);
+            blackhole.consume(pojo);
+            return pojo;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object cborReadSingle(JacksonState state, Blackhole blackhole) {
+    public Object cborRead1_1(JacksonState state, Blackhole blackhole) {
 
         try {
             Pojo1Mixed pojo = state.objectMapperCbor.readValue(state.bytesCbor, Pojo1Mixed.class);
@@ -286,10 +348,25 @@ public class IonMixedReadBenchmark {
         }
     }
 
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    public Object cborRead10_1(JacksonState state, Blackhole blackhole) {
+
+        try {
+            PojoArray1Mixed pojo = state.objectMapperCbor.readValue(state.bytesCbor10_1, PojoArray1Mixed.class);
+            blackhole.consume(pojo);
+            return pojo;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public Object protobufReadSingle(ProtobufState state, Blackhole blackhole) {
+    public Object protobufRead1_1(ProtobufState state, Blackhole blackhole) {
 
         try {
             TestPojo1MixedOuter.TestPojo1Mixed pojo = TestPojo1MixedOuter.TestPojo1Mixed.parseFrom(state.bytesProtobuf);

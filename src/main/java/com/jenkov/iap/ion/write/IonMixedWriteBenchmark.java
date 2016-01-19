@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by jjenkov on 07-11-2015.
  */
-public class IapMixedWriteBenchmark {
+public class IonMixedWriteBenchmark {
 
 
     @State(Scope.Thread)

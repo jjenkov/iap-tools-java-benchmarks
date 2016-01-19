@@ -7,6 +7,10 @@ public class PojoArray1Double {
 
     public Pojo1Double[] pojos = null;
 
+    public PojoArray1Double() {
+
+    }
+
     public PojoArray1Double(int count) {
         this.pojos = new Pojo1Double[count];
         for(int i=0; i < count; i++){

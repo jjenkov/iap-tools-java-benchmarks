@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Created by jjenkov on 10-11-2015.
  */
-public class IapTableWriteBenchmark {
+public class IonTableWriteBenchmark {
 
     public static class ArrayFieldPojo {
         public ThreeFieldPojo[] pojoArray = null;

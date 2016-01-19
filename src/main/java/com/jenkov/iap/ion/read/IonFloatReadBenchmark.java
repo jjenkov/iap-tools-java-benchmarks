@@ -17,7 +17,7 @@ import java.io.IOException;
 /**
  * Created by jjenkov on 07-11-2015.
  */
-public class IapFloatReadBenchmark {
+public class IonFloatReadBenchmark {
 
 
 

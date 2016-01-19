@@ -6,6 +6,8 @@ package com.jenkov.iap.ion.pojos;
 public class Pojo1Double {
     public double field0 = 1.1D;
 
+    public Pojo1Double() {}
+
     @Override
     public String toString() {
         return getClass().getSimpleName();

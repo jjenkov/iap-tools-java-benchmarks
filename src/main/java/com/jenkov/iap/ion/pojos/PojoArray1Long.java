@@ -7,6 +7,9 @@ public class PojoArray1Long {
 
     public Pojo1Long[] pojos = null;
 
+    public PojoArray1Long() {
+    }
+
     public PojoArray1Long(int count) {
         this.pojos = new Pojo1Long[count];
         for(int i=0; i < count; i++){
